@@ -681,6 +681,7 @@ const ChatComposerInner = ({
   const {
     skills: installedSkills,
     loading: isAvailableSkillsLoading,
+    refreshing: isAvailableSkillsRefreshing,
     error: availableSkillsError,
     refresh: refreshAvailableSkills
   } = useInstalledSkills(undefined, { enabled: skillsDataEnabled })
@@ -1673,7 +1674,7 @@ const ChatComposerInner = ({
         selectedSkills,
         tokenIds,
         skillByFilename,
-        !isAvailableSkillsLoading && !availableSkillsError
+        !isAvailableSkillsLoading && !isAvailableSkillsRefreshing && !availableSkillsError
       )
       return {
         ...payload,
@@ -1690,6 +1691,7 @@ const ChatComposerInner = ({
       fastMode,
       files,
       isAvailableSkillsLoading,
+      isAvailableSkillsRefreshing,
       reasoningEffort,
       selectedKnowledgeBasesInScope,
       selectedSkills,
@@ -1846,7 +1848,7 @@ const ChatComposerInner = ({
         selectedSkills,
         tokenIds,
         skillByFilename,
-        !isAvailableSkillsLoading && !availableSkillsError
+        !isAvailableSkillsLoading && !isAvailableSkillsRefreshing && !availableSkillsError
       )
       return withSkillScopePart(withKnowledgeScopePart(messageParts, knowledgeBaseIds), skillFolderNames)
     },
@@ -1854,6 +1856,7 @@ const ChatComposerInner = ({
       availableSkillsError,
       files,
       isAvailableSkillsLoading,
+      isAvailableSkillsRefreshing,
       selectedKnowledgeBasesInScope,
       selectedSkills,
       skillByFilename
