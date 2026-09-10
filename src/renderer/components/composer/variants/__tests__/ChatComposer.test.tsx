@@ -1478,6 +1478,22 @@ describe('ChatComposer', () => {
     expect(mocks.replaceDraft).toHaveBeenCalledWith({ text: 'continue', tokens: [] })
   })
 
+  it('prunes a selected skill chip when the skill becomes unavailable mid-session', async () => {
+    mocks.availableSkills = [pdfSkill]
+    mocks.getDraft.mockReturnValue({ text: 'partial', tokens: [pdfSkillDraftToken] })
+
+    const view = render(<ChatComposer topic={topic} onSend={vi.fn()} />)
+
+    // The skill leaves the installed set (uninstalled or globally disabled) — the chip
+    // must not survive into a later send.
+    mocks.availableSkills = []
+    view.rerender(<ChatComposer topic={topic} onSend={vi.fn()} />)
+
+    await waitFor(() => {
+      expect(mocks.surfaceProps?.tokens.some((token) => token.id === 'skill:pdf')).toBe(false)
+    })
+  })
+
   it('focuses only the current topic composer from the focus event', async () => {
     render(<ChatComposer topic={topic} onSend={vi.fn()} />)
 
@@ -2759,6 +2775,9 @@ describe('ChatComposer', () => {
       index: 0,
       textOffset: 0
     }
+    // Keep pdf installed so the availability prune leaves the in-progress token alone —
+    // this case pins history navigation, not uninstalled-skill pruning.
+    mocks.availableSkills = [pdfSkill]
     mocks.getDraft.mockImplementation(() => ({
       text: 'partial @pdf',
       tokens: [inProgressSkillToken]
