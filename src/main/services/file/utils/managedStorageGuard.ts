@@ -17,7 +17,9 @@ async function nearestExistingRealPath(candidate: string): Promise<string> {
       return path.resolve(physical, path.relative(probe, resolved))
     } catch (error) {
       const code = (error as NodeJS.ErrnoException).code
-      if (code !== 'ENOENT' && code !== 'ENOTDIR') throw error
+      // ENOENT / ENOTDIR are how POSIX says "this probe does not resolve, keep
+      // walking up"; redirected and network Windows volumes say EISDIR (#20572).
+      if (code !== 'ENOENT' && code !== 'ENOTDIR' && code !== 'EISDIR') throw error
       const parent = path.dirname(probe)
       if (parent === probe) return resolved
       probe = parent
